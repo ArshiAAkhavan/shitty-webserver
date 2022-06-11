@@ -1,9 +1,17 @@
 CC=gcc
-CFLAGS=-ggdb3 -c -Wall -std=gnu99
+
+ifdef mthread
+	CFLAGS=-ggdb3 -c -Wall -std=gnu99 -DMTHREAD
+else 
+	CFLAGS=-ggdb3 -c -Wall -std=gnu99
+endif
+
+
 LDFLAGS=-pthread
 SOURCES=httpserver.c libhttp.c wq.c mthread.c mprocess.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=httpserver
+
 
 all: $(SOURCES) $(EXECUTABLE)
 

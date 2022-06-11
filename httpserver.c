@@ -16,10 +16,6 @@
 #include "libhttp.h"
 #include "mthread.h"
 
-#ifndef MTHREAD
-#define MTHREAD
-#endif
-
 void submit_task(int client_socket_number) {
 #ifdef MTHREAD
   mthread_submit_task(client_socket_number);
