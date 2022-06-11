@@ -14,21 +14,22 @@
 #include <unistd.h>
 
 #include "libhttp.h"
+#include "mprocess.h"
 #include "mthread.h"
 
 void submit_task(int client_socket_number) {
 #ifdef MTHREAD
   mthread_submit_task(client_socket_number);
 #else
-  // mthread_submit_task(client_socket_number);
+  mprocess_submit_task(client_socket_number);
 #endif
 }
 
-void init_pool(int num_threads, void (*request_handler)(int)) {
+void init_pool(int parallelism_level, void (*request_handler)(int)) {
 #ifdef MTHREAD
-  mthread_init_pool(num_threads, request_handler);
+  mthread_init_pool(parallelism_level, request_handler);
 #else
-// mthread_init_pool(num_threads, request_handler)
+  mprocess_init_pool(parallelism_level, request_handler);
 #endif
 }
 /*
@@ -37,7 +38,7 @@ void init_pool(int num_threads, void (*request_handler)(int)) {
  * handle_proxy_request. Their values are set up in main() using the
  * command line arguments (already implemented for you).
  */
-int num_threads = 5;
+int parallelism_level = 5;
 int server_port;
 char *server_files_directory;
 char *server_proxy_hostname;
@@ -314,7 +315,7 @@ _Noreturn void serve_forever(int *socket_number, void (*request_handler)(int)) {
   printf("Listening on port %d...\n", server_port);
 
   // mthread_init_pool(num_threads, request_handler);
-  init_pool(num_threads, request_handler);
+  init_pool(parallelism_level, request_handler);
 
   while (1) {
     client_socket_number =
@@ -414,7 +415,7 @@ int main(int argc, char **argv) {
       server_port = atoi(server_port_string);
     } else if (strcmp("--num-threads", argv[i]) == 0) {
       char *num_threads_str = argv[++i];
-      if (!num_threads_str || (num_threads = atoi(num_threads_str)) < 1) {
+      if (!num_threads_str || (parallelism_level = atoi(num_threads_str)) < 1) {
         fprintf(stderr, "Expected positive integer after --num-threads\n");
         exit_with_usage();
       }
