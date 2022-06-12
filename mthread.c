@@ -1,6 +1,6 @@
 #include "wq.h"
-#include <unistd.h>
 #include <pthread.h>
+#include <unistd.h>
 
 static wq_t work_queue;
 
