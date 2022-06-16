@@ -23,3 +23,9 @@ $(EXECUTABLE): $(OBJECTS)
 
 clean:
 	rm -f $(EXECUTABLE) $(OBJECTS)
+
+install: all FORCE
+	mv httpserver /usr/local/bin/
+
+FORCE:
+
