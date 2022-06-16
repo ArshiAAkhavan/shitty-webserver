@@ -32,7 +32,7 @@ void init_pool(int parallelism_level, void (*request_handler)(int)) {
 #ifdef MTHREAD
   mthread_init_pool(parallelism_level,&log_queue, request_handler);
 #else
-  mprocess_init_pool(parallelism_level, request_handler);
+  mprocess_init_pool(parallelism_level,&log_queue, request_handler);
 #endif
 }
 /*
@@ -41,7 +41,7 @@ void init_pool(int parallelism_level, void (*request_handler)(int)) {
  * handle_proxy_request. Their values are set up in main() using the
  * command line arguments (already implemented for you).
  */
-int parallelism_level = 5;
+int parallelism_level = 1;
 int server_port;
 char *server_files_directory;
 char *server_proxy_hostname;
@@ -344,8 +344,8 @@ _Noreturn void serve_forever(int *socket_number, void (*request_handler)(int)) {
     // }
     // close(client_socket_number);
 
-    printf("closed connection from %s on port %d\n",
-           inet_ntoa(client_address.sin_addr), client_address.sin_port);
+    // printf("closed connection from %s on port %d\n",
+    //        inet_ntoa(client_address.sin_addr), client_address.sin_port);
   }
 
   shutdown(*socket_number, SHUT_RDWR);

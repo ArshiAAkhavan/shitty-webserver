@@ -24,7 +24,7 @@ static _Noreturn void thread_func(void (*request_handler)(int)) {
     elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0; // us to ms
 
     char text[1000];
-    sprintf(text, "%ld: request took: %f\n", t1.tv_sec, elapsedTime);
+    sprintf(text, "%ld: request took: %f", t1.tv_sec, elapsedTime);
     lq_push(log_queue, text);
   }
 }
