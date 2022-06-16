@@ -8,7 +8,7 @@ endif
 
 
 LDFLAGS=-pthread
-SOURCES=httpserver.c libhttp.c wq.c mthread.c mprocess.c
+SOURCES=httpserver.c libhttp.c wq.c mthread.c mprocess.c lq.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=httpserver
 

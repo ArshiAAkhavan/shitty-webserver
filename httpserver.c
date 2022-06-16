@@ -14,8 +14,11 @@
 #include <unistd.h>
 
 #include "libhttp.h"
+#include "lq.h"
 #include "mprocess.h"
 #include "mthread.h"
+
+lq_t log_queue;
 
 void submit_task(int client_socket_number) {
 #ifdef MTHREAD
@@ -27,7 +30,7 @@ void submit_task(int client_socket_number) {
 
 void init_pool(int parallelism_level, void (*request_handler)(int)) {
 #ifdef MTHREAD
-  mthread_init_pool(parallelism_level, request_handler);
+  mthread_init_pool(parallelism_level,&log_queue, request_handler);
 #else
   mprocess_init_pool(parallelism_level, request_handler);
 #endif
@@ -356,6 +359,12 @@ void signal_callback_handler(int signum) {
   printf("Closing socket %d\n", server_fd);
   if (close(server_fd) < 0)
     perror("Failed to close server_fd (ignoring)\n");
+
+  while (log_queue.size) {
+    char *text=lq_pop(&log_queue);
+    printf("%s\n",text);
+  }
+
   exit(0);
 }
 
