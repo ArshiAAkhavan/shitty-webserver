@@ -1,6 +1,6 @@
 #include "lq.h"
-#include "wq.h"
 #include "utils.h"
+#include "wq.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +13,7 @@ static lq_t *log_queue;
 static _Noreturn void thread_func(void (*request_handler)(int)) {
   while (1) {
     int fd = wq_pop(&work_queue);
-    char*log=log_wrapper(request_handler,fd);
+    char *log = log_wrapper(request_handler, fd);
     lq_push(log_queue, log);
     free(log);
   }
