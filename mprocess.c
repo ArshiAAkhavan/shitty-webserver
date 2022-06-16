@@ -1,5 +1,6 @@
 #include "lq.h"
 #include "wq.h"
+#include "utils.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +33,6 @@ static _Noreturn void thread_func(void (*request_handler)(int)) {
   while (1) {
     if (num_forked >= max_process) {
       wait_for_child();
-
       if (num_forked)
         num_forked--;
       continue;
@@ -45,24 +45,12 @@ static _Noreturn void thread_func(void (*request_handler)(int)) {
     pid_t cid = fork();
     if (cid == 0) {
       close(log_fd[0]);
-
-      struct timeval t1, t2;
-      double elapsedTime;
-
-      gettimeofday(&t1, NULL);
-      request_handler(fd);
-      close(fd);
-      gettimeofday(&t2, NULL);
-
-      elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;    // sec to ms
-      elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0; // us to ms
-
-      char text[1000];
-      sprintf(text, "%ld: request took: %f", t1.tv_sec, elapsedTime);
-      int nbytes = write(log_fd[1], text, strlen(text));
+      char* log=log_wrapper(request_handler,fd);
+      int nbytes = write(log_fd[1], log, strlen(log));
       printf("wrote %d bytes in fd:%d\n", nbytes, log_fd[1]);
       fflush(stdout);
 
+      free(log);
       exit(log_fd[0]);
     } else if (cid > 0) {
       close(log_fd[1]);

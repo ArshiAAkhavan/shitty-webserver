@@ -1,7 +1,9 @@
 #include "lq.h"
 #include "wq.h"
+#include "utils.h"
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -10,22 +12,10 @@ static lq_t *log_queue;
 
 static _Noreturn void thread_func(void (*request_handler)(int)) {
   while (1) {
-    struct timeval t1, t2;
-    double elapsedTime;
-
     int fd = wq_pop(&work_queue);
-
-    gettimeofday(&t1, NULL);
-    request_handler(fd);
-    close(fd);
-    gettimeofday(&t2, NULL);
-
-    elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;    // sec to ms
-    elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0; // us to ms
-
-    char text[1000];
-    sprintf(text, "%ld: request took: %f", t1.tv_sec, elapsedTime);
-    lq_push(log_queue, text);
+    char*log=log_wrapper(request_handler,fd);
+    lq_push(log_queue, log);
+    free(log);
   }
 }
 
