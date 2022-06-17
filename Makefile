@@ -28,5 +28,8 @@ install: all FORCE
 	cp httpserver /usr/local/bin/
 	cp ./httpserver.conf /etc/httpserver.conf
 
+uninstall: FORCE
+	rm -rf /usr/local/bin/httpserver
+	rm -rf /etc/httpserver.conf
 FORCE:
 
