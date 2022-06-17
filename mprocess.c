@@ -1,11 +1,9 @@
 #include "lq.h"
-#include "utils.h"
 #include "wq.h"
+#include "utils.h"
 #include <pthread.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -19,6 +17,7 @@ static lq_t *log_queue;
 static void wait_for_child() {
   int status;
   wait(&status);
+
   char text[1000];
   int log_read_fd = WEXITSTATUS(status);
   read(log_read_fd, text, sizeof(text));
@@ -42,10 +41,8 @@ static _Noreturn void thread_func(void (*request_handler)(int)) {
     pid_t cid = fork();
     if (cid == 0) {
       close(log_fd[0]);
-      char *log = log_wrapper(request_handler, fd);
-      int nbytes = write(log_fd[1], log, strlen(log));
-      printf("wrote %d bytes in fd:%d\n", nbytes, log_fd[1]);
-      fflush(stdout);
+      char* log=log_wrapper(request_handler,fd);
+      write(log_fd[1], log, strlen(log));
 
       free(log);
       exit(log_fd[0]);

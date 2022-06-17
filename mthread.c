@@ -2,10 +2,7 @@
 #include "utils.h"
 #include "wq.h"
 #include <pthread.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
-#include <unistd.h>
 
 static wq_t work_queue;
 static lq_t *log_queue;
