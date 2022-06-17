@@ -1,7 +1,12 @@
 # shitty-webserver
+it is a bizarre webserver implemented solely for AZOS (a course at my university).
 
-## build
-compile using multi threaded architecture (recommended):
+Caution:
+>Do not use it in production.
+>Do not use it in any circumstances!!!
+
+## Build
+Compile using multi threaded architecture (recommended):
 ```bash 
 make clean 
 make type=mhtread
@@ -13,17 +18,17 @@ make clean
 make type=mprocess
 ```
 
-## install 
+## Install 
 ```bash 
 sudo make install
 ```
 
-## uninstall 
+## Uninstall 
 ```bash 
 sudo make uninstall
 ```
-## configuration 
-sample configuration can be found in `httpserver.conf` file
+## Configuration 
+Sample configuration can be found in `httpserver.conf` file
 
 By default, `make install` would put a copy of `server.conf` in `/etc/httpserver.conf`, but you can disable this feature and add your configuration manually
 
