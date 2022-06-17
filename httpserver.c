@@ -403,13 +403,13 @@ int main(int argc, char **argv) {
     if (!strcmp(key, "port")) {
       server_port = atoi(value);
     } else if (!strcmp(key, "files")) {
-      server_files_directory = malloc(sizeof(char) * strlen(value));
-      memcpy(server_files_directory, value, sizeof(char) * strlen(value));
+      server_files_directory = malloc(sizeof(char) * strlen(value)+1);
+      memcpy(server_files_directory, value, sizeof(char) * strlen(value)+1);
     } else if (!strcmp(key, "concurrency_level")) {
       parallelism_level = atoi(value);
     } else if (!strcmp(key, "log_path")) {
       log_path = malloc(sizeof(char) * strlen(value)+1);
-      memcpy(log_path, value, sizeof(char) * strlen(value));
+      memcpy(log_path, value, sizeof(char) * strlen(value)+1);
     }
   }
 
