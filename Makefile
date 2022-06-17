@@ -25,7 +25,8 @@ clean:
 	rm -f $(EXECUTABLE) $(OBJECTS)
 
 install: all FORCE
-	mv httpserver /usr/local/bin/
+	cp httpserver /usr/local/bin/
+	cp ./httpserver.conf /etc/httpserver.conf
 
 FORCE:
 

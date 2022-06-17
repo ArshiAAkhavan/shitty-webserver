@@ -30,9 +30,9 @@ void submit_task(int client_socket_number) {
 
 void init_pool(int parallelism_level, void (*request_handler)(int)) {
 #ifdef MTHREAD
-  mthread_init_pool(parallelism_level,&log_queue, request_handler);
+  mthread_init_pool(parallelism_level, &log_queue, request_handler);
 #else
-  mprocess_init_pool(parallelism_level,&log_queue, request_handler);
+  mprocess_init_pool(parallelism_level, &log_queue, request_handler);
 #endif
 }
 /*
@@ -44,6 +44,7 @@ void init_pool(int parallelism_level, void (*request_handler)(int)) {
 int parallelism_level = 1;
 int server_port;
 char *server_files_directory;
+char *log_path;
 char *server_proxy_hostname;
 int server_proxy_port;
 
@@ -160,13 +161,10 @@ void handle_files_request(int fd) {
     return;
   }
 
-  /* Remove beginning `./` */
   char *path =
-      malloc(2 + strlen(server_files_directory) + strlen(request->path) + 1);
-  path[0] = '.';
-  path[1] = '/';
-  memcpy(path + 2, server_files_directory, strlen(server_files_directory) + 1);
-  memcpy(path + 2 + strlen(server_files_directory), request->path,
+      malloc(strlen(server_files_directory) + strlen(request->path) + 1);
+  memcpy(path, server_files_directory, strlen(server_files_directory) + 1);
+  memcpy(path + strlen(server_files_directory), request->path,
          strlen(request->path) + 1);
 
   struct stat sb = {0};
@@ -319,7 +317,6 @@ _Noreturn void serve_forever(int *socket_number, void (*request_handler)(int)) {
 
   // mthread_init_pool(num_threads, request_handler);
   init_pool(parallelism_level, request_handler);
-
   while (1) {
     client_socket_number =
         accept(*socket_number, (struct sockaddr *)&client_address,
@@ -361,8 +358,8 @@ void signal_callback_handler(int signum) {
     perror("Failed to close server_fd (ignoring)\n");
 
   while (log_queue.size) {
-    char *text=lq_pop(&log_queue);
-    printf("%s\n",text);
+    char *text = lq_pop(&log_queue);
+    printf("%s\n", text);
   }
 
   exit(0);
@@ -379,13 +376,40 @@ void exit_with_usage() {
   exit(EXIT_SUCCESS);
 }
 
+const char SERVER_CONF_PATH[] = "/etc/httpserver.conf";
+const int MAX_LINE_LENGTH = 100;
+
 int main(int argc, char **argv) {
   signal(SIGINT, signal_callback_handler);
   signal(SIGPIPE, SIG_IGN);
 
   /* Default settings */
   server_port = 8000;
-  void (*request_handler)(int) = NULL;
+  void (*request_handler)(int) = handle_files_request;
+
+  FILE *configs = fopen(SERVER_CONF_PATH, "r");
+  if (!configs) {
+    perror("unable to load config files");
+  }
+  char line[MAX_LINE_LENGTH];
+  char value[MAX_LINE_LENGTH];
+  char key[MAX_LINE_LENGTH];
+  while (fgets(line, MAX_LINE_LENGTH, configs)) {
+    sscanf(line, "%[^:]s", key);
+    sscanf(line, "%*s%s", value);
+
+    if (!strcmp(key, "port")) {
+      server_port = atoi(value);
+    } else if (!strcmp(key, "files")) {
+      server_files_directory = malloc(sizeof(char) * strlen(value));
+      memcpy(server_files_directory, value, sizeof(char) * strlen(value));
+    } else if (!strcmp(key, "concurrency_level")) {
+      parallelism_level = atoi(value);
+    } else if (!strcmp(key, "log_path")) {
+      log_path = malloc(sizeof(char) * strlen(value));
+      memcpy(log_path, key, sizeof(char) * strlen(value));
+    }
+  }
 
   int i;
   for (i = 1; i < argc; i++) {
