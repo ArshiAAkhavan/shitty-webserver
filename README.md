@@ -1,8 +1,9 @@
 # shitty-webserver
 it is a bizarre webserver implemented solely for AZOS (a course at my university).
 
-Caution:
+⚠️ Caution ⚠️:
 >Do not use it in production.
+>
 >Do not use it in any circumstances!!!
 
 ## Build
