@@ -357,9 +357,11 @@ void signal_callback_handler(int signum) {
   if (close(server_fd) < 0)
     perror("Failed to close server_fd (ignoring)\n");
 
+  FILE *log_file=fopen(log_path,"a+");
   while (log_queue.size) {
     char *text = lq_pop(&log_queue);
     printf("%s\n", text);
+    fprintf(log_file,"%s\n", text);
   }
 
   exit(0);
@@ -406,8 +408,8 @@ int main(int argc, char **argv) {
     } else if (!strcmp(key, "concurrency_level")) {
       parallelism_level = atoi(value);
     } else if (!strcmp(key, "log_path")) {
-      log_path = malloc(sizeof(char) * strlen(value));
-      memcpy(log_path, key, sizeof(char) * strlen(value));
+      log_path = malloc(sizeof(char) * strlen(value)+1);
+      memcpy(log_path, value, sizeof(char) * strlen(value));
     }
   }
 
