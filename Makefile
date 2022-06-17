@@ -1,6 +1,6 @@
 CC=gcc
 
-ifdef mthread
+ifeq "$(type)" "mthread"
 	CFLAGS=-ggdb3 -c -Wall -std=gnu99 -DMTHREAD
 else 
 	CFLAGS=-ggdb3 -c -Wall -std=gnu99
